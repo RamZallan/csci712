@@ -6,6 +6,7 @@
 const CANVAS_SIZE = 800;
 const BALL_RADIUS = 0.06;
 const BALL_MASS = 170;
+let RESTITUTION = 0.5;
 
 // Initialization
 var scene = new THREE.Scene();
@@ -120,6 +121,12 @@ document.addEventListener('keydown', (e) => {
         case 'a':
             cueModel.m.x -= 300;
             break;
+        case 'z':
+            RESTITUTION = 0.9;
+            break;
+        case 'x':
+            RESTITUTION = 0.5;
+            break;
     }
 });
 
@@ -140,7 +147,7 @@ function main() {
             force = unitVelocity.negate().multiplyScalar(9.8 * BALL_MASS * frictionCoeff);
 
             // Check for ball-cushion collision
-            const wall_e = 0.5;
+            const wall_e = RESTITUTION;
             if (model.m.length() !== 0) { // model has momentum
                 if (model.model.position.x >= (2 - BALL_RADIUS)) { // hit right short wall
                     model.model.position.x = 2 - BALL_RADIUS;
