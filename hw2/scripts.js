@@ -55,22 +55,56 @@ const blackMat = new THREE.MeshPhongMaterial({ color: 0x111111 });
 
 const cueBall = new THREE.Mesh(ballGeo, cueMat);
 cueBall.position.x = -1;
+cueBall.name = 'cueBall';
 balls.add(cueBall);
 
 const redBall = new THREE.Mesh(ballGeo, redMat);
 redBall.position.x = 1;
+redBall.name = 'redBall';
 balls.add(redBall);
 const blueBall = new THREE.Mesh(ballGeo, blueMat);
 blueBall.position.x = 1.12;
 blueBall.position.z = 0.1;
+blueBall.name = 'blueBall';
 balls.add(blueBall);
 const blackBall = new THREE.Mesh(ballGeo, blackMat);
 blackBall.position.x = -1.2;
 blackBall.position.z = 0.05;
+blackBall.name = 'blackBall';
 balls.add(blackBall);
 
 balls.position.y = 0.1 + BALL_RADIUS;
 scene.add(balls);
+
+const pockets = new THREE.Group();
+const pocketMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+const pocketGeo = new THREE.SphereGeometry(BALL_RADIUS + 0.05, 32, 32);
+
+const backLeft = new THREE.Mesh(pocketGeo, pocketMat);
+backLeft.position.x = -1.95;
+backLeft.position.z = -0.95;
+pockets.add(backLeft);
+const backRight = new THREE.Mesh(pocketGeo, pocketMat);
+backRight.position.x = 1.95;
+backRight.position.z = 0.95;
+pockets.add(backRight);
+const frontRight = new THREE.Mesh(pocketGeo, pocketMat);
+frontRight.position.x = 1.95;
+frontRight.position.z = -0.95;
+pockets.add(frontRight);
+const frontLeft = new THREE.Mesh(pocketGeo, pocketMat);
+frontLeft.position.x = -1.95;
+frontLeft.position.z = 0.95;
+pockets.add(frontLeft);
+const backMiddle = new THREE.Mesh(pocketGeo, pocketMat);
+backMiddle.position.z = -0.95;
+pockets.add(backMiddle);
+const frontMiddle = new THREE.Mesh(pocketGeo, pocketMat);
+frontMiddle.position.z = 0.95;
+pockets.add(frontMiddle);
+
+pockets.position.y = 0.1 + BALL_RADIUS;
+scene.add(pockets);
 
 // Light
 const overheadLight = new THREE.PointLight(0xffffff, 1);
@@ -101,6 +135,7 @@ const blueModel = new Model('blueBall', blueBall);
 const redModel = new Model('redBall', redBall);
 const blackModel = new Model('blackBall', blackBall);
 const models = [cueModel, blueModel, redModel, blackModel];
+const pocketMeshs = [backLeft, backRight, frontRight, frontLeft, backMiddle, frontMiddle];
 
 // After 1 second, apply force to the cue ball (hitting it)
 setTimeout(() => {
@@ -108,24 +143,25 @@ setTimeout(() => {
 }, 1000);
 
 document.addEventListener('keydown', (e) => {
+    const moveAmmt = 200;
     switch(e.key) {
         case 'w': 
-            cueModel.m.z -= 300;
+            cueModel.m.z -= moveAmmt;
             break;
         case 'd':
-            cueModel.m.x += 300;
+            cueModel.m.x += moveAmmt;
             break;
         case 's':
-            cueModel.m.z += 300;
+            cueModel.m.z += moveAmmt;
             break;
         case 'a':
-            cueModel.m.x -= 300;
+            cueModel.m.x -= moveAmmt;
             break;
         case 'z':
-            RESTITUTION = 0.9;
+            RESTITUTION = moveAmmt;
             break;
         case 'x':
-            RESTITUTION = 0.5;
+            RESTITUTION = moveAmmt;
             break;
     }
 });
@@ -137,6 +173,7 @@ function main() {
         const delta = clock.getDelta();
 
         for (model of models) {
+            if (!model.model.visible) continue;
             // Move model for velocity
             model.model.position.add(model.m.clone().divideScalar(BALL_MASS).multiplyScalar(delta));
 
@@ -169,13 +206,12 @@ function main() {
             }
             // Check for ball-ball collisions
             for (other of models) {
+                if (!other.model.visible) continue;
                 if (model == other) {
                     continue;
                 }
                 let dist = model.model.position.distanceTo(other.model.position);
                 if (dist < (BALL_RADIUS * 2 - 0.001)) {
-
-
                     let error = (BALL_RADIUS * 2) - dist;
                     while (error > 0.001) {
                         const unitMomentum = model.m.clone().negate().normalize().multiplyScalar(error);
@@ -197,6 +233,20 @@ function main() {
                     model.m.add(impulse);
                     other.m.sub(impulse);
                 }
+            }
+
+            for (pocket of pocketMeshs) {
+                let dist = model.model.position.distanceTo(pocket.position);
+                if (dist < (BALL_RADIUS + BALL_RADIUS + 0.05)) {
+                    if (model.model.name === 'cueBall') {
+                        model.model.position.x = 0;
+                        model.model.position.z = 0;
+                        model.m.set(0, 0, 0);
+                    } else {
+                        const ballObj = scene.getObjectByName(model.model.name);
+                        ballObj.visible = false;
+                    }
+                } 
             }
 
             model.m = model.m.add(force.multiplyScalar(delta));
