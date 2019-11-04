@@ -7,6 +7,18 @@ const CANVAS_SIZE = 800;
 const BALL_RADIUS = 0.06;
 const BALL_MASS = 170;
 let RESTITUTION = 0.5;
+let FRICTION = 0.04;
+
+$(document).ready(() => {
+    $("#ball-cushion").on("input change", (e) => {
+        RESTITUTION = parseFloat(e.target.value);
+        $('#restitution-value').text(e.target.value);
+    });
+    $("#friction").on("input change", (e) => {
+        FRICTION = parseFloat(e.target.value);
+        $('#friction-value').text(e.target.value);
+    });
+});
 
 // Initialization
 var scene = new THREE.Scene();
@@ -157,12 +169,6 @@ document.addEventListener('keydown', (e) => {
         case 'a':
             cueModel.m.x -= moveAmmt;
             break;
-        case 'z':
-            RESTITUTION = moveAmmt;
-            break;
-        case 'x':
-            RESTITUTION = moveAmmt;
-            break;
     }
 });
 
@@ -179,28 +185,26 @@ function main() {
 
             // Lower velocity for gravity
             let force = new THREE.Vector3();
-            const frictionCoeff = 0.04;
             const unitVelocity = model.m.clone().divideScalar(BALL_MASS).normalize();
-            force = unitVelocity.negate().multiplyScalar(9.8 * BALL_MASS * frictionCoeff);
+            force = unitVelocity.negate().multiplyScalar(9.8 * BALL_MASS * FRICTION);
 
             // Check for ball-cushion collision
-            const wall_e = RESTITUTION;
             if (model.m.length() !== 0) { // model has momentum
                 if (model.model.position.x >= (2 - BALL_RADIUS)) { // hit right short wall
                     model.model.position.x = 2 - BALL_RADIUS;
-                    model.m.multiplyScalar(wall_e);
+                    model.m.multiplyScalar(RESTITUTION);
                     model.m.x = -model.m.x;
                 } else if (model.model.position.x <= (-2 + BALL_RADIUS)) { // hit left short wall
                     model.model.position.x = -2 + BALL_RADIUS;
-                    model.m.multiplyScalar(wall_e);
+                    model.m.multiplyScalar(RESTITUTION);
                     model.m.x = -model.m.x;
                 } else if (model.model.position.z <= (-1 + BALL_RADIUS)) { // hit far long wall
                     model.model.position.z = -1 + BALL_RADIUS;
-                    model.m.multiplyScalar(wall_e);
+                    model.m.multiplyScalar(RESTITUTION);
                     model.m.z = -model.m.z;
                 } else if (model.model.position.z >= (1 - BALL_RADIUS)) { // hit far long wall
                     model.model.position.z = 1 - BALL_RADIUS;
-                    model.m.multiplyScalar(wall_e);
+                    model.m.multiplyScalar(RESTITUTION);
                     model.m.z = -model.m.z;
                 }
             }

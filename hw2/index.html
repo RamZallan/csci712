@@ -6,11 +6,21 @@
     </head>
     <body>
         <script src="https://threejs.org/build/three.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="scripts.js"></script>
         <br />
         <p>Object balls are removed when they hit a pocket, while the cue is put in the center of the table.</p>
         <p>The cue ball will automatically hit the others on load, or you can use WASD to control its movement.</p>
-        <p>Press z to set the coefficient of restitution for ball-cushion collisions to 0.9, and x to reset to 0.5.</p>
+        Ball-Cushion Coefficient of Restitution:
+        <span id="restitution-value">0.5</span><br />
+        <input type="range" id="ball-cushion" min="0" max="1" step="0.1" value="0.5">
+        <br />
+
+        Coefficient of Friction:
+        <span id="friction-value">0.04</span><br />
+        <input type="range" id="friction" min="0" max="0.5" step="0.01" value="0.04">
+        <br />
+
         <a href="https://github.com/ramzallan/csci712/">View on GitHub</a>
     </body>
 </html>
