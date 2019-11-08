@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CSCI-712 Assignment 3</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <a href="/hw3/">Click to view wave.bvh</a>
+
+        <script src="https://threejs.org/build/three.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="parse-bvh.js"></script>
+
+        <p>Frame Number: <span id="frameNum">0</span></p>
+        <input id="frame" type="range" min="0" max="9999" step="1" value="0" />
+
+        <p>Frame Time: <span id="frameRate">0.033</span> sec/frame</p>
+
+        <input
+            id="rate"
+            type="range"
+            min="0.01"
+            max="1"
+            step="0.01"
+            value="0.03"
+        />
+
+        <br />
+        <p>
+            I haven't been able to figure out joint rotation, but I have BVH
+            parsing and root X/Y/Zpositions figured out. The frame number and
+            frame time sliders above correctly control the animation, but only
+            the position of the model is taken into account.
+        </p>
+
+        <script src="ambient.js"></script>
+        <br />
+        <a href="https://github.com/ramzallan/csci712/">View on GitHub</a>
+    </body>
+</html>
