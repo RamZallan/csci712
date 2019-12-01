@@ -98,15 +98,17 @@ function main() {
             const delta = clock.getDelta();
             const vel = particle.velocity.clone().multiplyScalar(0.2);
             particle.position.add(vel);
+            particle.material.opacity = 1.0 - age / PARTICLE_LIFETIME;
         }
 
         // add new particles
-
         for (let i = 0; i < PARTICLES_PER_FRAME; i++) {
             const particleMesh = new THREE.Mesh(
                 particleGeo,
                 new THREE.MeshBasicMaterial({
-                    color: `hsl(${Math.random() * 255}, 70%, 50%)`
+                    color: `hsl(${Math.random() * 255}, 70%, 50%)`,
+                    transparent: true,
+                    opacity: 1.0
                 })
             );
 
