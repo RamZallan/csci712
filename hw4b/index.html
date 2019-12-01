@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CSCI-712 Assignment 4a</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://threejs.org/build/three.js"></script>
+        <script src="scripts.js"></script>
+        <br />
+
+        <p>Force ratios:</p>
+
+        <p>Following <span id="followingVal">0</span></p>
+        <input
+            id="following"
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value="0"
+        />
+
+        <p>Collision Avoidance <span id="collisionVal">0</span></p>
+        <input
+            id="collision"
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value="0"
+        />
+
+        <p>Flock Centering <span id="centeringVal">0</span></p>
+        <input
+            id="centering"
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value="0"
+        />
+
+        <p>Velocity Matching <span id="velocityVal">0</span></p>
+        <input
+            id="velocity"
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value="0"
+        />
+
+        <br />
+
+        <a href="https://github.com/ramzallan/csci712/">View on GitHub</a>
+    </body>
+</html>
