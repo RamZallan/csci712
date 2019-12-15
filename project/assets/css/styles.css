@@ -1,4 +1,11 @@
-body, html {
+@import url('https://fonts.googleapis.com/css?family=Rubik:300,400,500,700,900&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+body,
+html {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -7,4 +14,22 @@ body, html {
 
 canvas {
     display: block;
+}
+
+#details {
+    position: absolute;
+    top: 0;
+    left: 0;
+    text-align: center;
+    width: 100%;
+    padding: 10px;
+    font-size: 1.25em;
+    color: #dddddd;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 400;
+}
+
+#details strong {
+    color: #ffffff;
+    font-weight: 700;
 }
