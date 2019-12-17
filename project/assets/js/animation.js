@@ -120,20 +120,27 @@ function displayDetails(options) {
         chose its <strong style="color: ${
             options.primaryColor
         }">color</strong> and made it ${rotationStr}.<br />
-        ${options.primaryRotation != 'none' &&
-            `Your longitude (${
-                options.position
-                    ? options.position.longitude.toFixed(2) + '°'
-                    : 'none'
-            }) set its rotation to the <strong>${options.primaryAxis.toUpperCase()}-axis</strong>`}.<br />
+        ${
+            options.primaryRotation != 'none'
+                ? `Your longitude (${
+                      options.position
+                          ? options.position.longitude.toFixed(2) + '°'
+                          : 'none'
+                  }) set its rotation to the <strong>${options.primaryAxis.toUpperCase()}-axis</strong>.<br />`
+                : ''
+        }
         Your viewport width (${options.width}px) made it
         <strong>translate ${options.primaryTranslation}ly</strong>. <br />
-        Using <strong>${options.browser}</strong> translates it at <strong>${
-            options.primaryTranslationSpeed
-        } units/frame</strong>.<br/>
-        Using <strong>${options.os}</strong> rotates it at <strong>${
-            options.primaryRotationSpeed
-        } radians/frame</strong>.`
+        Using <strong>${
+            options.browser
+        }</strong> translates it at <strong>${options.primaryTranslationSpeed.toFixed(
+            2
+        )} units/frame</strong>.<br/>
+        Using <strong>${
+            options.os
+        }</strong> rotates it at <strong>${options.primaryRotationSpeed.toFixed(
+            2
+        )} radians/frame</strong>.`
     );
 }
 
@@ -215,8 +222,10 @@ function animate(options) {
         }
 
         // primary rotation
-        primary.rotation[options.primaryAxis] +=
-            rotationCoeff * options.primaryRotationSpeed;
+        if (options.primaryRotation !== ROTATION_TYPES.none) {
+            primary.rotation[options.primaryAxis] +=
+                rotationCoeff * options.primaryRotationSpeed;
+        }
 
         // primary scale
         primary.scale.addScalar(scaleCoeff * 0.01);
