@@ -1,7 +1,5 @@
-// maybe display a map to show the attributes of the animation
-
+// Constants
 const BASE_SIZE = 1;
-
 const SHAPES = Object.freeze({
     box: new THREE.BoxGeometry(BASE_SIZE, BASE_SIZE, BASE_SIZE),
     cone: new THREE.ConeGeometry(BASE_SIZE, BASE_SIZE * 1.5, 32),
@@ -9,28 +7,29 @@ const SHAPES = Object.freeze({
     dodecahedron: new THREE.DodecahedronGeometry(BASE_SIZE),
     knot: new THREE.TorusKnotGeometry(BASE_SIZE / 2, BASE_SIZE / 5, 100, 32)
 });
-
 const TRANSLATION_TYPES = Object.freeze({
     none: 'none',
     vertical: 'vertical',
     horizontal: 'horizontal',
     all: 'all'
 });
-
 const ROTATION_TYPES = Object.freeze({
     none: 'none',
     constant: 'constant',
     oscillate: 'oscillate'
 });
-
 const SCALE_TYPES = ['pulsating', 'none'];
-
 const TRANSLATION_BOUND = 1;
 const SCALE_BOUND = 0.25;
 
+/*
+Gets an option object to shape the animation
+param info: an object of position, viewport size, etc. to shape the options
+*/
 function getOptions(info) {
     const options = { ...info };
 
+    // latitude -> shape geometry
     if (!info.position) {
         options.primaryShape = 'knot'; // no position data
     } else if (info.position.latitude > 30) {
@@ -41,14 +40,17 @@ function getOptions(info) {
         options.primaryShape = 'pyramid'; // South America, parts of Oceania, and Antarctica
     }
 
+    // color -> hue saturation lightness w/ hue being ms % 255
     options.primaryColor = `hsl(${info.datetime.getMilliseconds() %
         255}, 50%, 50%)`;
 
+    // by viewport width -> translation type (vert. on mobile, horiz. on desktop)
     options.primaryTranslation =
         info.width < info.height
             ? TRANSLATION_TYPES.vertical
             : TRANSLATION_TYPES.horizontal;
 
+    // current hour -> rotation type
     const hour = info.datetime.getHours();
     if (hour < 10) {
         options.primaryRotation = ROTATION_TYPES.none; // no rotation early morning, too much fuss
@@ -58,6 +60,7 @@ function getOptions(info) {
         options.primaryRotation = ROTATION_TYPES.oscillate; // evening
     }
 
+    // longitude -> rotation axis
     if (!info.position) {
         options.primaryAxis = 'x'; // no position data
     } else if (info.position.longitude < 0) {
@@ -66,8 +69,8 @@ function getOptions(info) {
         options.primaryAxis = 'z'; // east of prime meridian
     }
 
+    // browser name -> translation speed
     options.browser = info.useragent[0].ua.family;
-
     if (options.browser.includes('Chrome')) {
         options.primaryTranslationSpeed = 0.05;
     } else if (options.browser.includes('Safari')) {
@@ -78,12 +81,17 @@ function getOptions(info) {
         options.primaryTranslationSpeed = 0.03;
     }
 
+    // os name -> rotation speed
     options.os = info.useragent[0].os.family;
     options.primaryRotationSpeed = options.os.length / 150; // Fedora => 0.04, Mac OS X => 0.053
 
     return options;
 }
 
+/*
+Creates human readable sentences to detail the various options derived
+param options: returned object from getOptions() function
+*/
 function displayDetails(options) {
     const details = $('#details');
     let primaryName =
@@ -122,14 +130,17 @@ function displayDetails(options) {
         <strong>translate ${options.primaryTranslation}ly</strong>. <br />
         Using <strong>${options.browser}</strong> translates it at <strong>${
             options.primaryTranslationSpeed
-        } units/frame</strong>, and using <strong>${
-            options.os
-        }</strong> rotates it at <strong>${
+        } units/frame</strong>.<br/>
+        Using <strong>${options.os}</strong> rotates it at <strong>${
             options.primaryRotationSpeed
         } radians/frame</strong>.`
     );
 }
 
+/*
+Returns a Promise that returns either an empty object or a user's position
+Uses the navigator.geolocation API, whose permission can be approved/declined by a user
+*/
 function getUserLocation() {
     if (navigator.geolocation) {
         return new Promise((resolve, reject) =>
@@ -140,6 +151,10 @@ function getUserLocation() {
     }
 }
 
+/*
+Initializes the various Three.js classes needed for the main animation
+param options: object returned by getOptions() method
+*/
 function animate(options) {
     const width = document.body.clientWidth;
     const height = document.body.clientHeight;
@@ -184,6 +199,9 @@ function animate(options) {
 
     displayDetails(options);
 
+    /*
+    Main animation loop, using the initialized classes in outter scope
+    */
     function render() {
         // primary translation
         primary.position[translationAxis] +=
@@ -209,10 +227,12 @@ function animate(options) {
         renderer.render(scene, camera);
         requestAnimationFrame(render);
     }
-
     render();
 }
 
+/*
+Called on document load to get user info object and call animation functions with derived options
+*/
 function init() {
     let data = {
         width: $(window).width(),
